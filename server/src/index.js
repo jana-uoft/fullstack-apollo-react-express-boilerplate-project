@@ -17,7 +17,10 @@ const port = process.env.PORT || 8000;
 
 let mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
-mongoose.connect(process.env.DATABASE);
+mongoose.connect(
+  process.env.DATABASE,
+  { useNewUrlParser: true },
+);
 
 const app = express();
 
@@ -87,8 +90,8 @@ const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
 
 const createUsersWithMessages = async date => {
-  await models.User.remove({});
-  await models.Message.remove({});
+  await models.User.deleteMany({});
+  await models.Message.deleteMany({});
 
   // and rise again
   await new models.User({
