@@ -1,16 +1,11 @@
-const message = (sequelize, DataTypes) => {
-  const Message = sequelize.define('message', {
-    text: {
-      type: DataTypes.STRING,
-      validate: { notEmpty: true },
-    },
-  });
+import mongoose from 'mongoose';
 
-  Message.associate = models => {
-    Message.belongsTo(models.User);
-  };
+const Schema = mongoose.Schema;
 
-  return Message;
-};
+const messageSchema = new Schema({
+    userId: Schema.Types.ObjectId,
+    createdAt: { type: Date, default: Date.now },
+    text: String,
+}, { collection: 'Message' });
 
-export default message;
+export default mongoose.model('Message', messageSchema);
