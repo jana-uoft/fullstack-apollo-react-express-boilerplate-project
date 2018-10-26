@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import http from 'http';
 import cors from 'cors';
+import morgan from 'morgan';
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import DataLoader from 'dataloader';
@@ -24,6 +25,8 @@ mongoose.connect(
 const app = express();
 
 app.use(cors());
+
+app.use(morgan('dev'));
 
 const getMe = async req => {
   const token = req.headers['x-token'];
@@ -87,54 +90,59 @@ const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
 
 const createUsersWithMessages = async date => {
-  const newUser1 = await models.User.findOneAndUpdate(
-    { email: 'hello@robin.com' },
+  // destroy it all
+  await models.User.collection.drop();
+  await models.Message.collection.drop();
+
+  // and rise again
+  new models.User(
     {
       username: 'rwieruch',
       email: 'hello@robin.com',
       password: 'rwieruch',
-      role: 'ADMIN',
-    },
-    {
-      upsert: true,
-      new: true,
-    },
-  );
+      role: 'ADMIN'
+    }
+  ).save(async function (err, user) {
+    if (err) {
+      console.log(err);
+    } else {
+      user.messages.push(await new models.Message(
+        {
+          text: 'Published the Road to learn React',
+          createdAt: date.setSeconds(date.getSeconds() + 1),
+          user: user
+        }
+      ).save());
+    }
+  });
 
-  const newUser2 = await models.User.findOneAndUpdate(
-    { email: 'hello@david.com' },
+  new models.User(
     {
       username: 'ddavids',
       email: 'hello@david.com',
-      password: 'ddavids',
-    },
-    {
-      upsert: true,
-      new: true,
-    },
-  );
+      password: 'ddavids'
+    }
+  ).save(async function (err, user) {
+    if (err) {
+      console.log(err);
+    } else {
+      user.messages.push(await new models.Message(
+        {
+          text: 'Happy to release a GraphQL in React tutorial',
+          createdAt: date.setSeconds(date.getSeconds() + 1),
+          user: user
+        }
+      ).save());
 
-  await models.Message.deleteMany({
-    userId: { $in: [newUser1._id, newUser2._id] },
+      user.messages.push(new models.Message(
+        {
+          text: 'A complete React with Apollo and GraphQL Tutorial',
+          createdAt: date.setSeconds(date.getSeconds() + 1),
+          user: user
+        }
+      ).save());
+    }
   });
-
-  await models.Message.insertMany([
-    {
-      userId: newUser1._id,
-      text: 'Published the Road to learn React',
-      createdAt: date.setSeconds(date.getSeconds() + 1),
-    },
-    {
-      userId: newUser2._id,
-      text: 'Happy to release a GraphQL in React tutorial',
-      createdAt: date.setSeconds(date.getSeconds() + 1),
-    },
-    {
-      userId: newUser2._id,
-      text: 'A complete React with Apollo and GraphQL Tutorial',
-      createdAt: date.setSeconds(date.getSeconds() + 1),
-    },
-  ]);
 };
 
 createUsersWithMessages(new Date());

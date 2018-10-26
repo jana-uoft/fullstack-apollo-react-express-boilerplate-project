@@ -55,8 +55,8 @@ export default {
     },
 
     Message: {
-        user: async (message, args, { models, loaders: { user } }) =>
-            await user.load(message.userId, models),
+        user: async (message) =>
+            (await message.populate('user').execPopulate()).user
     },
 
     Subscription: {
