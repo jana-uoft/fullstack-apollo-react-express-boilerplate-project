@@ -78,7 +78,7 @@ export default {
     },
 
     User: {
-        messages: async (user, args, { models: { Message } }) =>
-            await Message.find({ userId: user.id }),
+        messages: async (user) =>
+            (await user.populate('messages').execPopulate()).messages
     },
 };

@@ -9,26 +9,18 @@ const userSchema = new Schema(
     email: String,
     password: String,
     role: String,
-  },
-  { collection: 'User' },
-);
+    messages: [{type: Schema.Types.ObjectId, ref: 'Message'}]
+}, { collection: 'User' });
 
 userSchema.pre('save', async function(next) {
   this.password = await this.generateHash(this.password);
   next();
 });
 
-//unfortunately
-userSchema.pre('findOneAndUpdate', async function(next) {
-  this._update.password = await this.schema.methods.generateHash(
-    this._update.password,
-  );
-  next();
-});
 
-userSchema.methods.generateHash = async password => {
-  const saltRounds = 10;
-  return await bcrypt.hash(password, saltRounds);
+userSchema.methods.generateHash = async (password) => {
+    const saltRounds = 10;
+    return await bcrypt.hash(password, saltRounds);
 };
 
 userSchema.methods.validatePassword = async (
