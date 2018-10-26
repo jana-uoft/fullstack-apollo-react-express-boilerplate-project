@@ -8,7 +8,7 @@ import { ApolloServer } from 'apollo-server-express';
 import { AuthenticationError } from 'apollo-server';
 
 import schema from './schema';
-import resolvers from './resolvers/index';
+import resolvers from './resolvers';
 import models from './models';
 import loaders from './loaders';
 
@@ -16,7 +16,10 @@ const port = process.env.PORT || 8000;
 
 let mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
-mongoose.connect(`mongodb://${process.env.DATABASE_URL || 'localhost'}:${process.env.DATABASE_PORT || '27017'}/${process.env.DATABASE}`);
+mongoose.connect(
+  `mongodb://${process.env.DATABASE_URL || 'localhost'}:${process.env
+    .DATABASE_PORT || '27017'}/${process.env.DATABASE}`,
+);
 
 const app = express();
 
@@ -90,11 +93,13 @@ const createUsersWithMessages = async date => {
       username: 'rwieruch',
       email: 'hello@robin.com',
       password: 'rwieruch',
-      role: 'ADMIN'
-    }, {
+      role: 'ADMIN',
+    },
+    {
       upsert: true,
       new: true,
-    });
+    },
+  );
 
   const newUser2 = await models.User.findOneAndUpdate(
     { email: 'hello@david.com' },
@@ -102,27 +107,35 @@ const createUsersWithMessages = async date => {
       username: 'ddavids',
       email: 'hello@david.com',
       password: 'ddavids',
-    }, {
+    },
+    {
       upsert: true,
       new: true,
-    });
+    },
+  );
 
-  await models.Message.deleteMany({ userId: { $in: [newUser1._id, newUser2._id] } });
+  await models.Message.deleteMany({
+    userId: { $in: [newUser1._id, newUser2._id] },
+  });
 
-  await models.Message.insertMany([{
-    userId: newUser1._id,
-    text: 'Published the Road to learn React',
-    createdAt: date.setSeconds(date.getSeconds() + 1),
-  }, {
-    userId: newUser2._id,
-    text: 'Happy to release a GraphQL in React tutorial',
-    createdAt: date.setSeconds(date.getSeconds() + 1),
-  }, {
-    userId: newUser2._id,
-    text: 'A complete React with Apollo and GraphQL Tutorial',
-    createdAt: date.setSeconds(date.getSeconds() + 1),
-  }]);
-}
+  await models.Message.insertMany([
+    {
+      userId: newUser1._id,
+      text: 'Published the Road to learn React',
+      createdAt: date.setSeconds(date.getSeconds() + 1),
+    },
+    {
+      userId: newUser2._id,
+      text: 'Happy to release a GraphQL in React tutorial',
+      createdAt: date.setSeconds(date.getSeconds() + 1),
+    },
+    {
+      userId: newUser2._id,
+      text: 'A complete React with Apollo and GraphQL Tutorial',
+      createdAt: date.setSeconds(date.getSeconds() + 1),
+    },
+  ]);
+};
 
 createUsersWithMessages(new Date());
 
