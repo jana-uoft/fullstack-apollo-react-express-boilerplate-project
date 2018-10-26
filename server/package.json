@@ -22,8 +22,8 @@
     "graphql": "^14.0.0-rc.2",
     "graphql-resolvers": "^0.2.2",
     "jsonwebtoken": "^8.3.0",
-    "pg": "^7.4.3",
-    "sequelize": "^4.38.0"
+    "mongoose": "^5.3.7",
+    "pg": "^7.4.3"
   },
   "devDependencies": {
     "axios": "^0.18.0",
