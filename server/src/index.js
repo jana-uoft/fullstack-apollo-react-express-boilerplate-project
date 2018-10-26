@@ -87,57 +87,52 @@ const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
 
 const createUsersWithMessages = async date => {
-  // destroy it all
-  await models.User.collection.drop();
-  await models.Message.collection.drop();
+  await models.User.remove({});
+  await models.Message.remove({});
 
   // and rise again
-  new models.User(
-    {
-      username: 'rwieruch',
-      email: 'hello@robin.com',
-      password: 'rwieruch',
-      role: 'ADMIN'
-    }
-  ).save(async function (err, user) {
+  await new models.User({
+    username: 'rwieruch',
+    email: 'hello@robin.com',
+    password: 'rwieruch',
+    role: 'ADMIN',
+  }).save(async function(err, user) {
     if (err) {
       console.log(err);
     } else {
-      user.messages.push(await new models.Message(
-        {
+      await user.messages.push(
+        await new models.Message({
           text: 'Published the Road to learn React',
           createdAt: date.setSeconds(date.getSeconds() + 1),
-          user: user
-        }
-      ).save());
+          user: user._id,
+        }).save(),
+      );
     }
   });
 
-  new models.User(
-    {
-      username: 'ddavids',
-      email: 'hello@david.com',
-      password: 'ddavids'
-    }
-  ).save(async function (err, user) {
+  await new models.User({
+    username: 'ddavids',
+    email: 'hello@david.com',
+    password: 'ddavids',
+  }).save(async function(err, user) {
     if (err) {
       console.log(err);
     } else {
-      user.messages.push(await new models.Message(
-        {
+      await user.messages.push(
+        await new models.Message({
           text: 'Happy to release a GraphQL in React tutorial',
           createdAt: date.setSeconds(date.getSeconds() + 1),
-          user: user
-        }
-      ).save());
+          user: user._id,
+        }).save(),
+      );
 
-      user.messages.push(new models.Message(
-        {
+      await user.messages.push(
+        await new models.Message({
           text: 'A complete React with Apollo and GraphQL Tutorial',
           createdAt: date.setSeconds(date.getSeconds() + 1),
-          user: user
-        }
-      ).save());
+          user: user._id,
+        }).save(),
+      );
     }
   });
 };
