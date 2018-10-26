@@ -16,10 +16,7 @@ const port = process.env.PORT || 8000;
 
 let mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
-mongoose.connect(
-  `mongodb://${process.env.DATABASE_URL || 'localhost'}:${process.env
-    .DATABASE_PORT || '27017'}/${process.env.DATABASE}`,
-);
+mongoose.connect(process.env.DATABASE);
 
 const app = express();
 
