@@ -17,7 +17,10 @@ const port = process.env.PORT || 8000;
 
 let mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
-mongoose.connect(process.env.DATABASE);
+mongoose.connect(
+  process.env.DATABASE,
+  { useNewUrlParser: true },
+);
 
 const app = express();
 
@@ -96,31 +99,31 @@ const createUsersWithMessages = async date => {
     username: 'rwieruch',
     email: 'hello@robin.com',
     password: 'rwieruch',
-    role: 'ADMIN'
+    role: 'ADMIN',
   });
 
   let user2 = new models.User({
     username: 'ddavids',
     email: 'hello@david.com',
-    password: 'ddavids'
+    password: 'ddavids',
   });
 
   let message1 = new models.Message({
     text: 'Published the Road to learn React',
     createdAt: date.setSeconds(date.getSeconds() + 1),
-    user: user1.id   
-  });  
+    user: user1.id,
+  });
 
   let message2 = new models.Message({
     text: 'Happy to release a GraphQL in React tutorial',
     createdAt: date.setSeconds(date.getSeconds() + 1),
-    user: user2.id
+    user: user2.id,
   });
 
   let message3 = new models.Message({
     text: 'A complete React with Apollo and GraphQL Tutorial',
     createdAt: date.setSeconds(date.getSeconds() + 1),
-    user: user2.id
+    user: user2.id,
   });
 
   message1.save();
@@ -133,7 +136,7 @@ const createUsersWithMessages = async date => {
 
   user1.save();
   user2.save();
-}
+};
 
 createUsersWithMessages(new Date());
 
