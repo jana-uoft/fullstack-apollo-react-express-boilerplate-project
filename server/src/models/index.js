@@ -1,9 +1,9 @@
-import User from './user'
-import Message from './message'
+import User from './user';
+import Message from './message';
 
 const models = {
-    User,
-    Message,
+  User,
+  Message,
 };
 
 export default models;
