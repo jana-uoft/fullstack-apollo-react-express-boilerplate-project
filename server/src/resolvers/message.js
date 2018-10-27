@@ -35,12 +35,18 @@ export default {
   Mutation: {
     createMessage: combineResolvers(
       isAuthenticated,
-      async (parent, { text }, { models: { Message }, me }) => {
+      async (parent, { text }, { models: { Message, User }, me }) => {
+        let date = new Date();
         let message = new Message({
           user: me._id,
           text,
+          createdAt: date.setSeconds(date.getSeconds() + 1),
         });
         await message.save();
+
+        let user = await User.findById(me._id);
+        user.messages.push(message.id);
+        await user.save();
 
         pubsub.publish(EVENTS.MESSAGE.CREATED, {
           messageCreated: { message },
