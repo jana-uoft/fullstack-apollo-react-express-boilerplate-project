@@ -13,19 +13,31 @@ export default {
   Query: {
     messages: async (
       parent,
-      { cursor, limit = 100 },
+      { cursor, limit = 100, order = 'desc' },
       { models: { Message } },
     ) => {
-      const hasNextPage = false;
-      const edges = Message.find({});
-
-      return {
-        edges,
-        pageInfo: {
-          hasNextPage,
-          endCursor: 'test',
-        },
+      const query = cursor
+        ? { createdAt: { $lt: fromCursorHash(cursor) } }
+        : {};
+      const options = {
+        sort: { createdAt: order },
+        limit: limit + 1,
       };
+
+      return Message.find(query, {}, options).then(messages => {
+        const hasNextPage = messages.length > limit;
+        const edges = hasNextPage ? messages.slice(0, -1) : messages;
+
+        return {
+          edges,
+          pageInfo: {
+            hasNextPage,
+            endCursor: toCursorHash(
+              edges[edges.length - 1].createdAt.toString(),
+            ),
+          },
+        };
+      });
     },
 
     message: async (parent, { id: _id }, { models }) =>
