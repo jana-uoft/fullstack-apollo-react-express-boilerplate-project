@@ -7,20 +7,35 @@ const userSchema = new Schema(
   {
     username: String,
     email: String,
-    password: String,
+    hashed_password: {
+      type: String,
+      default: '',
+    },
     role: String,
-    messages: [{type: Schema.Types.ObjectId, ref: 'Message'}]
-}, { collection: 'User' });
+    messages: [{ type: Schema.Types.ObjectId, ref: 'Message' }],
+  },
+  { collection: 'User' },
+);
+
+// Virtuals
+userSchema
+  .virtual('password')
+  // set methods
+  .set(function(password) {
+    this._password = password;
+  });
 
 userSchema.pre('save', async function(next) {
-  this.password = await this.generateHash(this.password);
+  if (this._password === undefined) {
+    return next();
+  }
+  this.hashed_password = await this.generateHash(this._password);
   next();
 });
 
-
-userSchema.methods.generateHash = async (password) => {
-    const saltRounds = 10;
-    return await bcrypt.hash(password, saltRounds);
+userSchema.methods.generateHash = async password => {
+  const saltRounds = 10;
+  return await bcrypt.hash(password, saltRounds);
 };
 
 userSchema.methods.validatePassword = async (

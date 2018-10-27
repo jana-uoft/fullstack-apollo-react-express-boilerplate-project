@@ -55,13 +55,15 @@ const authLink = new ApolloLink((operation, forward) => {
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
-    graphQLErrors.forEach(({ message, locations, path }) => {
-      console.log('GraphQL error', message);
+    graphQLErrors.forEach(
+      ({ extensions: { code }, message, locations, path }) => {
+        console.log('GraphQL error', message);
 
-      if (message === 'NOT_AUTHENTICATED') {
-        signOut(client);
-      }
-    });
+        if (code === 'UNAUTHENTICATED') {
+          signOut(client);
+        }
+      },
+    );
   }
 
   if (networkError) {

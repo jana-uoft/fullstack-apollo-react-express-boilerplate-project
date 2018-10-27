@@ -90,54 +90,52 @@ const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
 
 const createUsersWithMessages = async date => {
+  // destroy it all
   await models.User.deleteMany({});
   await models.Message.deleteMany({});
 
-  // and rise again
-  await new models.User({
+  // to rise again
+  let user1 = new models.User({
     username: 'rwieruch',
     email: 'hello@robin.com',
     password: 'rwieruch',
     role: 'ADMIN',
-  }).save(async function(err, user) {
-    if (err) {
-      console.log(err);
-    } else {
-      await user.messages.push(
-        await new models.Message({
-          text: 'Published the Road to learn React',
-          createdAt: date.setSeconds(date.getSeconds() + 1),
-          user: user._id,
-        }).save(),
-      );
-    }
   });
 
-  await new models.User({
+  let user2 = new models.User({
     username: 'ddavids',
     email: 'hello@david.com',
     password: 'ddavids',
-  }).save(async function(err, user) {
-    if (err) {
-      console.log(err);
-    } else {
-      await user.messages.push(
-        await new models.Message({
-          text: 'Happy to release a GraphQL in React tutorial',
-          createdAt: date.setSeconds(date.getSeconds() + 1),
-          user: user._id,
-        }).save(),
-      );
-
-      await user.messages.push(
-        await new models.Message({
-          text: 'A complete React with Apollo and GraphQL Tutorial',
-          createdAt: date.setSeconds(date.getSeconds() + 1),
-          user: user._id,
-        }).save(),
-      );
-    }
   });
+
+  let message1 = new models.Message({
+    text: 'Published the Road to learn React',
+    createdAt: date.setSeconds(date.getSeconds() + 1),
+    user: user1.id,
+  });
+
+  let message2 = new models.Message({
+    text: 'Happy to release a GraphQL in React tutorial',
+    createdAt: date.setSeconds(date.getSeconds() + 1),
+    user: user2.id,
+  });
+
+  let message3 = new models.Message({
+    text: 'A complete React with Apollo and GraphQL Tutorial',
+    createdAt: date.setSeconds(date.getSeconds() + 1),
+    user: user2.id,
+  });
+
+  message1.save();
+  message2.save();
+  message3.save();
+
+  user1.messages.push(message1.id);
+  user2.messages.push(message2.id);
+  user2.messages.push(message3.id);
+
+  user1.save();
+  user2.save();
 };
 
 createUsersWithMessages(new Date());
