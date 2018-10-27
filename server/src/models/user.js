@@ -17,13 +17,9 @@ const userSchema = new Schema(
   { collection: 'User' },
 );
 
-// Virtuals
-userSchema
-  .virtual('password')
-  // set methods
-  .set(function(password) {
-    this._password = password;
-  });
+userSchema.virtual('password').set(function(password) {
+  this._password = password;
+});
 
 userSchema.pre('save', async function(next) {
   if (this._password === undefined) {
