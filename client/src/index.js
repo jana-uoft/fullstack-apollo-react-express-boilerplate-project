@@ -23,7 +23,7 @@ const wsLink = new WebSocketLink({
     reconnect: true,
   },
 });
-//test
+
 const terminatingLink = split(
   ({ query }) => {
     const { kind, operation } = getMainDefinition(query);
